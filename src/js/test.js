@@ -1,65 +1,44 @@
+import {createStore, applyMiddleware} from "redux";
 
-import {createStore, combineReducers} from "redux";
 
+const reducer = function (state=1, action) {
 
-const userReducer=(state={},action)=>{
-    const newState=Object.assign({},state);
-    switch(action.type){
-        case "CHANGE_NAME":{
-            newState.name=action.payload;
-            break;
-        }
-        case "DES":{
-            newState.age=action.payload;
-            break;
-        }
-
+    switch (action.type) {
+        case "INC":
+            console.log("*****************888",state + 1);
+            return state + 1;
+        case "DES":
+            return state - 1;
+        case '@@redux/INIT':
+            return 15;
+        default:
+            console.log(state, action.type);
+            return state;
     }
-    return newState;
 };
 
-const tweetsReducer=(state=[],action)=>{
-    //switch(action.type){
-    //    case "INC":
-    //        return action.payload;
-    //    case "DES":
-    //        return state - action.payload;
-    //}
-
-    return state;
+const logger = (store)=>(next)=>(action)=> {
+    //console.log(next);
+    console.log("action is fired ", action);
+    next(action)
 };
 
-const reducers=combineReducers({
-    user:userReducer,
-    tweets:tweetsReducer
-});
+const middleware = applyMiddleware(logger);
 
-const reducer = function(state=1, action){
-   switch(action.type){
-       case "INC":
-           return state+action.payload;
-       case "DES":
-           return state - action.payload;
-   }
-};
+const store = createStore(reducer, 11,middleware);
 
-const store = createStore(reducers, {
-    user:{
-        name:"Neha",
-        age:"27"
-    },
-    tweets:[]
-});
-
-console.log(store);
+console.log(store.getState(), '*************');
 
 // to listen the store change we need subscriber
 store.subscribe(()=>{
     console.log("store changed", store.getState());
 });
 
-store.dispatch({type:"CHANGE_NAME", payload: "Naina"});
-store.dispatch({type:"CHANGE_AGE", payload: 28});
-store.dispatch({type:"ADD_TWEET", payload: ["test"]});
-store.dispatch({type:"DELETE_TWEET", payload: ["work"]});
+
+store.dispatch({type: "INC"});
+store.dispatch({type: "INC"});
+store.dispatch({type: "INC"});
+store.dispatch({type: "DES"});
+store.dispatch({type: "INC"});
+store.dispatch({type: "DES"});
 
