@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --content-base src --inline --hot",
-
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0"
   }
 }

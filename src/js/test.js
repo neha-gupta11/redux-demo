@@ -1,13 +1,15 @@
 import {createStore, applyMiddleware} from "redux";
+import logger from "redux-logger"
+import thunk from "redux-thunk"
 
 
-const reducer = function (state=1, action) {
+const reducer = function (state, action) {
 
     switch (action.type) {
-        case "INC":
-            console.log("*****************888",state + 1);
+        case "INCREMENT":
             return state + 1;
-        case "DES":
+        case "DECREMENT":
+            console.log("decrement",state);
             return state - 1;
         case '@@redux/INIT':
             return 15;
@@ -15,6 +17,7 @@ const reducer = function (state=1, action) {
             console.log(state, action.type);
             return state;
     }
+
 };
 
 const logger = (store)=>(next)=>(action)=> {
@@ -23,22 +26,40 @@ const logger = (store)=>(next)=>(action)=> {
     next(action)
 };
 
-const middleware = applyMiddleware(logger);
+const middleware = applyMiddleware(thunk,logger);
 
-const store = createStore(reducer, 11,middleware);
+const store = createStore(
+    reducer,
+    middleware
+);
 
-console.log(store.getState(), '*************');
+
+console.log(store.getState());
 
 // to listen the store change we need subscriber
-store.subscribe(()=>{
-    console.log("store changed", store.getState());
+//store.subscribe(()=>{
+//    console.log("store changed", store.getState());
+//});
+
+
+
+// It still recognizes plain object actions
+store.dispatch({ type: 'INCREMENT' })
+
+// But with thunk middleware, it also recognizes functions
+store.dispatch(function (dispatch) {
+    // ... which themselves may dispatch many times
+    dispatch({ type: 'INCREMENT' })
+    dispatch({ type: 'INCREMENT' })
+    dispatch({ type: 'INCREMENT' })
+
+    setTimeout(() => {
+        // ... even asynchronously!
+        dispatch({ type: 'DECREMENT' });
+        console.log(store.getState());
+    }, 1000)
 });
 
 
-store.dispatch({type: "INC"});
-store.dispatch({type: "INC"});
-store.dispatch({type: "INC"});
-store.dispatch({type: "DES"});
-store.dispatch({type: "INC"});
-store.dispatch({type: "DES"});
+
 
